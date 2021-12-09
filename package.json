@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/pmungra/tinyapp/issues"
   },
-  "homepage": "https://github.com/pmungra/tinyapp#readme"
+  "homepage": "https://github.com/pmungra/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
