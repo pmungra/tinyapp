@@ -31,6 +31,7 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Edit</th>
           <th scope="col">Delete</th>
         </tr>
       </thead>
@@ -39,6 +40,9 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
+            <td>
+              <button type="submit"<a class="btn btn-success" href="/urls/<%= url %>"> Edit </button> </a>
+            </td>
             <td>
               <form method="POST" action="/urls/<%= url %>/delete">
                 <button type="submit" class="btn btn-success"> Delete </button>  <!--Source:https://getbootstrap.com/docs/4.0/components/buttons/-->
