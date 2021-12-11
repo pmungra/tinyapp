@@ -4,8 +4,11 @@ const app = express();
 const PORT = 8080; // default port 8080
 //The body-parser library will convert the request body from a Buffer into string that we can read. It will then add the data to the req(request) object under the key body.
 const bodyParser = require("body-parser");
+const cookie = require('cookie-parser')
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+app.use(cookie());
+
 //Redirect Short URLs
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -26,14 +29,16 @@ app.get("/hello", (req, res) => {
 
 // Adding Route for /urls  to displayed on the main page
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username: req.cookies['username'] };
   res.render("urls_index", templateVars);
 //  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 // Adding GET Route to Show the Form (new url is created)
+//Adding an endpoint to handle a POST to /login in your Express server
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = { username: req.cookies['username']}
+  res.render("urls_new", templateVars);
 });
 
 // Redirecting to new Page
@@ -41,7 +46,8 @@ app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (verifyShortUrl(shortURL)) {
     let longURL = urlDatabase[req.params.shortURL];
-    let templateVars = { shortURL: shortURL, longURL: longURL };
+    let templateVars = { shortURL: shortURL, longURL: longURL, username: req.cookies['username']
+  };
     res.render("urls_show", templateVars);
   } else {
     res.send('does not exist');
@@ -81,6 +87,21 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   const edit = req.params.shortURL;
   urlDatabase[edit] = req.body.longURL;
   res.redirect(`/urls`)
+});
+
+// endpoint user login
+app.post("/login", (req, res) => {
+  if (req.body.username) {
+    const username = req.body.username;
+    res.cookie('username', username);
+  }
+  res.redirect('/urls');
+});
+
+// endpoint user logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
