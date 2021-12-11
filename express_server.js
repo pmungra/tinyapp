@@ -69,18 +69,18 @@ app.get("/u/:shortURL", (req, res) => {
   }
 });
 
-//Routing on Server ==>Add a POST route that removes a URL resource: POST /urls/:shortURL/delete ===>redirect the client back to the urls_index page ("/urls")
+//Delete: Routing on Server ==>Add a POST route that removes a URL resource: POST /urls/:shortURL/delete ===>redirect the client back to the urls_index page ("/urls")
 app.post("/urls/:shortURL/delete", (req, res) => {
   const urlToDelete = req.params.shortURL;
   delete urlDatabase[urlToDelete];
   res.redirect('/urls');
 });
 
-//Add a POST route that updates a URL resource; POST /urls/edit
+//Edit: Add a POST route that updates a URL resource; POST /urls/edit
 app.post("/urls/:shortURL/edit", (req, res) => {
-  const key = req.params.shortURL;
-  urlDatabase[key] = req.body.longURL;
-  res.redirect('/urls')
+  const edit = req.params.shortURL;
+  urlDatabase[edit] = req.body.longURL;
+  res.redirect(`/urls`)
 });
 
 app.listen(PORT, () => {
