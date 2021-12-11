@@ -72,3 +72,18 @@ app.get("/u/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+//Implementing a Random ShortURL function(Reference:https://pretagteam.com/question/random-text-generator-js)
+function generateRandomString() {
+  const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
+  const upperCase = lowerCase.toUpperCase();
+  const numeric = '1234567890';
+  const alphaNumeric = lowerCase + upperCase + numeric;
+  let index = Math.round(Math.random() * 100);
+  if (index > 61) {
+    while (index > 61) {
+      index = Math.round(Math.random() * 100);
+    }
+  }
+  return alphaNumeric[index];
+};
