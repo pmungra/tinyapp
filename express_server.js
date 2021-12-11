@@ -36,10 +36,16 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-
+// Redirecting to new Page
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase.shortURL };
-  res.render("urls_show", templateVars);
+  let shortURL = req.params.shortURL;
+  if (verifyShortUrl(shortURL)) {
+    let longURL = urlDatabase[req.params.shortURL];
+    let templateVars = { shortURL: shortURL, longURL: longURL };
+    res.render("urls_show", templateVars);
+  } else {
+    res.send('does not exist');
+  }
 });
 
 // Adding POST Route to Receive the Form Submission
