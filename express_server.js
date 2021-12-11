@@ -76,6 +76,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+//Add a POST route that updates a URL resource; POST /urls/edit
+app.post("/urls/:shortURL/edit", (req, res) => {
+  const key = req.params.shortURL;
+  urlDatabase[key] = req.body.longURL;
+  res.redirect('/urls')
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
