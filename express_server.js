@@ -87,3 +87,17 @@ function generateRandomString() {
   }
   return alphaNumeric[index];
 };
+
+// function will generate a unique url, string random alphaNumeric values
+const generateShortURL = () => {
+  let randomString = '';
+  while (randomString.length < 6) {
+    randomString += generateRandomString();
+  }
+  return randomString;
+} ;
+
+//function will show if short url exists
+const verifyShortUrl = URL => {
+  return urlDatabase[URL];
+}; 
