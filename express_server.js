@@ -57,6 +57,18 @@ app.post("/urls", (req, res) => {
 });
 
 
+// Redirect to longURL
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  if (verifyShortUrl(shortURL)) {
+    const longURL = urlDatabase[shortURL];
+    res.redirect(longURL);
+  } else {
+    res.status(404);
+    res.send('Page does not exist');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
