@@ -105,7 +105,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 // endpoint user login
 app.post("/login", (req, res) => {
-  if (req.body.username) {
+  if (userDatabase[req.body.username]) {
     const username = req.body.username;
     res.cookie('username', username);
   }
