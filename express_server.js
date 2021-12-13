@@ -5,29 +5,24 @@ const PORT = 8080; // default port 8080
 //The body-parser library will convert the request body from a Buffer into string that we can read. It will then add the data to the req(request) object under the key body.
 const bodyParser = require("body-parser");
 const cookie = require('cookie-parser')
+const morgan = require('morgan');
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(cookie());
+app.use(morgan('dev'));
+
+const {verifyShortUrl, randomString, checkIfAvail, addUser, fetchUserInfo} = require('./helper');
 
 //Redirect Short URLs
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "part1"},
+  "9sm5xK": {longURL: "http://www.google.com", userID: "part2"},
 };
 
 //Createing a users Object
-const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  }
-}
+const userDatabase = {
+  "part1": {id: "nat123", "email-address":"parthpmungra@gmail.com", password: "parthpmungra1"}
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -43,7 +38,7 @@ app.get("/hello", (req, res) => {
 
 // Adding Route for /urls  to displayed on the main page
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: req.cookies['user_id'] };
+  let templateVars = { urls: urlDatabase, current_user: currentUser(req.cookies['user_id']) };
   res.render("urls_index", templateVars);
 //  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
@@ -51,36 +46,38 @@ app.get("/urls", (req, res) => {
 // Adding GET Route to Show the Form (new url is created)
 //Adding an endpoint to handle a POST to /login in your Express server
 app.get("/urls/new", (req, res) => {
-  let templateVars = { user_id: req.cookies['user_id']}
+  const current_user = currentUser(req.cookies['user_id'])
+  if (!current_user) {
+    res.redirect('/login');
+  }
+  let templateVars = { current_user: current_user }
   res.render("urls_new", templateVars);
 });
 
 // Redirecting to new Page
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  if (verifyShortUrl(shortURL)) {
+  if (verifyShortUrl(shortURL, urlDatabase)) {
     let longURL = urlDatabase[req.params.shortURL];
-    let templateVars = { shortURL: shortURL, longURL: longURL, user_id: req.cookies['user_id']
-  };
+    let templateVars = { shortURL: shortURL, longURL: longURL, current_user: currentUser(req.cookies['user_id'])};
     res.render("urls_show", templateVars);
   } else {
-    res.send('does not exist');
-  }
-});
+    res.send('does not exist')
+  }});
 
 // Adding POST Route to Receive the Form Submission
 app.post("/urls", (req, res) => {
-  const shortURL = generateShortURL();
+  const shortURL = randomString();
   const newURL = req.body.longURL;
   urlDatabase[shortURL] = newURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
 
-// Redirect to longURL
+// Redirecting to longURL
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  if (verifyShortUrl(shortURL)) {
+  if (verifyShortUrl(shortURL, urlDatabase)) {
     const longURL = urlDatabase[shortURL];
     res.redirect(longURL);
   } else {
@@ -103,13 +100,48 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   res.redirect(`/urls`)
 });
 
-// endpoint user login
+// Registration form
+app.get("/register", (req, res) => {
+  templateVars = { current_user: currentUser(req.cookies['user_id'], userDatabase)}
+  res.render("urls_register", templateVars);
+});
+
+//To check if email is already registered
+app.post("/register", (req, res) => {
+  const {password} = req.body;
+  const email = req.body['email-address']
+  if (email === '') {
+    res.status(400).send('Email is required');
+  } else if (password === '') {
+    res.status(400).send('Password is required');
+  } else if (!checkIfAvail(email, userDatabase)) {
+    res.status(400).send('This email is already registered');
+  } else {
+  const newUser = addUser(req.body, userDatabase)
+  res.cookie('user_id', newUser.id)
+  res.redirect('/urls');
+}});
+
+app.get("/login", (req, res) => {
+  templateVars = { current_user: currentUser(req.cookies['user_id'], userDatabase) }
+  res.render("login", templateVars);
+});
+
 app.post("/login", (req, res) => {
-  if (userDatabase[req.body.user_id]) {
-    const user_id = req.body.user_id;
-    res.cookie('user_id', user_id);
+  const emailUsed = req.body['email-address'];
+  const pwdUsed = req.body['password'];
+  if (fetchUserInfo(emailUsed, userDatabase)) {
+    const password = fetchUserInfo(emailUsed, userDatabase).password;
+    const id = fetchUserInfo(emailUsed, userDatabase).id;
+    if (password !== pwdUsed) {
+      res.status(403).send('Error 403... re-enter your password')
+    } else {
+      res.cookie('user_id', id);
+      res.redirect('/urls');
+    }
+  } else {
+    res.status(403).send('Error 403... email not found')
   }
-  res.status(400).send(`It's us not you, please try after sometime`)
 });
 
 // endpoint user logout
@@ -118,77 +150,6 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls');
 });
 
-// Registration form
-app.get("/register", (req, res) => {
-  templateVars = { user_id:req.cookies['user_id']}
-  res.render("urls_register", templateVars);
-
-});
-
-//Adding user if available
-const addUser = newUser => {
-  const newUserId = generateShortURL();
-  newUser.id = newUserId
-  userDatabase[newUserId] = newUser;
-  return newUser
-}
-
-//To check if emails are registered
-const checkIfAvail = (newVal, database) => {
-  for (user in database) {
-    if (!user[newVal]) {
-      return null;
-    }
-  }
-  return true;
-}
-
-//To check if email is already registered
-app.post("/register", (req, res) => {
-  const {email, password} = req.body;
-  if (email === '') {
-    res.status(400).send('Email is required');
-  } else if (password === '') {
-    res.status(400).send('Password is required');
-  } else if (!checkIfAvail(email, userDatabase)) {
-    res.status(400), send('This email is already registered')
-  }
-  newUser = addUser(req.body)
-  res.cookie('user_id', newUser.id)
-  res.redirect('/urls');
-})
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
-//Implementing a Random ShortURL function(Reference:https://pretagteam.com/question/random-text-generator-js)
-function generateRandomString() {
-  const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
-  const upperCase = lowerCase.toUpperCase();
-  const numeric = '1234567890';
-  const alphaNumeric = lowerCase + upperCase + numeric;
-  let index = Math.round(Math.random() * 100);
-  if (index > 61) {
-    while (index > 61) {
-      index = Math.round(Math.random() * 100);
-    }
-  }
-  return alphaNumeric[index];
-};
-
-// function will generate a unique url, string random alphaNumeric values
-const generateShortURL = () => {
-  let randomString = '';
-  while (randomString.length < 6) {
-    randomString += generateRandomString();
-  }
-  return randomString;
-} ;
-
-//function will show if short url exists
-const verifyShortUrl = URL => {
-  return urlDatabase[URL];
-}; 
