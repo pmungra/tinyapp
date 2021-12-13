@@ -108,8 +108,8 @@ app.post("/login", (req, res) => {
   if (userDatabase[req.body.user_id]) {
     const user_id = req.body.user_id;
     res.cookie('user_id', user_id);
-  }
-  res.status(400).send('Error')
+  
+  res.status(400).send(`It's us not you, please try after sometime`)
 });
 
 // endpoint user logout
@@ -143,6 +143,7 @@ const checkIfAvail = (newVal, database) => {
   return true;
 }
 
+//To check if email is already registered
 app.post("/register", (req, res) => {
   const {email, password} = req.body;
   if (email === '') {
