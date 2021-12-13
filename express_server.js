@@ -104,9 +104,50 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls');
 });
 
+// Registration form
+app.get("/register", (req, res) => {
+  templateVars = { username:req.cookies['username']}
+  res.render("urls_register", templateVars);
+
+})
+
+//Adding user if available
+const addUser = newUser => {
+  const newUserId = generateShortURL();
+  newUser.id = newUserId
+  userDatabase[newUserId] = newUser;
+  return newUser
+}
+
+//To check if emails are registered
+const checkIfAvail = (newVal, database) => {
+  for (user in database) {
+    if (!user[newVal]) {
+      return null;
+    }
+  }
+  return true;
+}
+
+app.post("/register", (req, res) => {
+  const {email, password} = req.body;
+  if (email === '') {
+    res.status(400).send('Email is required');
+  } else if (password === '') {
+    res.status(400).send('Password is required');
+  } else if (!checkIfAvail(email, userDatabase)) {
+    res.status(400), send('This email is already registered')
+  }
+  newUser = addUser(req.body)
+  res.cookie('user_id', newUser.id)
+  res.redirect('/urls');
+})
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
 
 //Implementing a Random ShortURL function(Reference:https://pretagteam.com/question/random-text-generator-js)
 function generateRandomString() {
