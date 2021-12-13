@@ -109,7 +109,7 @@ app.post("/login", (req, res) => {
     const user_id = req.body.user_id;
     res.cookie('user_id', user_id);
   }
-  res.redirect('/urls');
+  res.status(400).send('Error')
 });
 
 // endpoint user logout
