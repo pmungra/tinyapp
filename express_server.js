@@ -108,7 +108,7 @@ app.post("/login", (req, res) => {
   if (userDatabase[req.body.user_id]) {
     const user_id = req.body.user_id;
     res.cookie('user_id', user_id);
-  
+  }
   res.status(400).send(`It's us not you, please try after sometime`)
 });
 
@@ -123,7 +123,7 @@ app.get("/register", (req, res) => {
   templateVars = { user_id:req.cookies['user_id']}
   res.render("urls_register", templateVars);
 
-})
+});
 
 //Adding user if available
 const addUser = newUser => {
