@@ -43,7 +43,7 @@ app.get("/hello", (req, res) => {
 
 // Adding Route for /urls  to displayed on the main page
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies['username'] };
+  let templateVars = { urls: urlDatabase, user_id: req.cookies['user_id'] };
   res.render("urls_index", templateVars);
 //  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
@@ -51,7 +51,7 @@ app.get("/urls", (req, res) => {
 // Adding GET Route to Show the Form (new url is created)
 //Adding an endpoint to handle a POST to /login in your Express server
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies['username']}
+  let templateVars = { user_id: req.cookies['user_id']}
   res.render("urls_new", templateVars);
 });
 
@@ -60,7 +60,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (verifyShortUrl(shortURL)) {
     let longURL = urlDatabase[req.params.shortURL];
-    let templateVars = { shortURL: shortURL, longURL: longURL, username: req.cookies['username']
+    let templateVars = { shortURL: shortURL, longURL: longURL, user_id: req.cookies['user_id']
   };
     res.render("urls_show", templateVars);
   } else {
@@ -105,22 +105,22 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 // endpoint user login
 app.post("/login", (req, res) => {
-  if (userDatabase[req.body.username]) {
-    const username = req.body.username;
-    res.cookie('username', username);
+  if (userDatabase[req.body.user_id]) {
+    const user_id = req.body.user_id;
+    res.cookie('user_id', user_id);
   }
   res.redirect('/urls');
 });
 
 // endpoint user logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
 // Registration form
 app.get("/register", (req, res) => {
-  templateVars = { username:req.cookies['username']}
+  templateVars = { user_id:req.cookies['user_id']}
   res.render("urls_register", templateVars);
 
 })
