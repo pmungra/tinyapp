@@ -57,7 +57,7 @@ const fetchUserInfo = (email, database) => {
   return undefined;
 };
 
-const currentUser = (cookie, database) => {
+const getUserByEmail = (cookie, database) => {
   for (let ids in database) {
     if (cookie === ids) {
       return database[ids].email;
@@ -67,10 +67,10 @@ const currentUser = (cookie, database) => {
 
 //Return url where the userID is equal to the id of current user
 const urlsForUser = (id, database) => {
-  let currentUserId = id;
+  let getUserByEmailId = id;
   let usersURLs = {};
   for (let key in database) {
-    if (database[key].userID === currentUserId) {
+    if (database[key].userID === getUserByEmailId) {
       usersURLs[key] = database[key];
     }
   }
@@ -81,4 +81,4 @@ const checkOwner = (userId, urlID, database) => {
 };
 
 
-module.exports = {verifyShortUrl, randomString, checkIfAvail, addUser, fetchUserInfo, currentUser, urlsForUser, checkOwner};
+module.exports = {verifyShortUrl, randomString, getUserByEmail , checkIfAvail, addUser, fetchUserInfo, urlsForUser, checkOwner};
