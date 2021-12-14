@@ -4,17 +4,19 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Screenshot of Home page"](https://github.com/lighthouse-labs/tinyapp/blob/master/docs/HomePage.png)
+!["Screenshot of Home page"](https://github.com/pmungra/tinyapp/blob/master/docs/HomePage.png)
 
-!["Screenshot of Registration Page"](https://github.com/lighthouse-labs/tinyapp/blob/master/docs/.Registration_Pagepng)
+!["Screenshot of Registration Page"](https://github.com/pmungra/tinyapp/blob/master/docs/Registration_Page.png)
 
-!["Screenshot of Login Page"](https://github.com/lighthouse-labs/tinyapp/blob/master/docs/Login_Page.png)
+!["Screenshot of Login Page"](https://github.com/pmungra/tinyapp/blob/master/docs/Login_Page.png)
 
-!["Screenshot of Landing Page"](https://github.com/lighthouse-labs/tinyapp/blob/master/docs/Landing_Page.png)
+!["Screenshot of Landing Page"](https://github.com/pmungra/tinyapp/blob/master/docs/Landing_Page.png)
 
-!["Screenshot of Tiny Urlgenerator Page"](https://github.com/lighthouse-labs/tinyapp/blob/master/docs/Tiny_Urlgenerator_Page.png)
+!["Screenshot of Tiny Urlgenerator Page"](https://github.com/pmungra/tinyapp/blob/master/docs/Tiny_Urlgenerator_Page.png)
 
-!["Screenshot of Tiny Edit Page"](https://github.com/lighthouse-labs/tinyapp/blob/master/docs/Edit_Page.png)
+!["Screenshot of My URL Page"](https://github.com/pmungra/tinyapp/blob/master/docs/My_URL_Page.png)
+
+!["Screenshot of Tiny Edit Page"](https://github.com/pmungra/tinyapp/blob/master/docs/Edit_Page.png)
 
 ## Dependencies
 
